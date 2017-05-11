@@ -1,13 +1,13 @@
 var express = require('express')
 var app = express()
-var config = require('dotenv').config()
+var config = require('dotenv').config().parsed
 
 const API_PREFIX = '/ifttt/v1/'
 
 const isValid = (req) => {
   const requestKey = req.headers['ifttt-channel-key']
 
-  return requestKey == config.parsed.IFTTT_API_KEY
+  return requestKey == config.IFTTT_API_KEY
 }
 
 app.get(`${API_PREFIX}status`, function (req, res) {
