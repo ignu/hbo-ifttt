@@ -19,5 +19,8 @@
   "bugs": {
     "url": "https://github.com/ignu/hbo-ifttt/issues"
   },
-  "homepage": "https://github.com/ignu/hbo-ifttt#readme"
+  "homepage": "https://github.com/ignu/hbo-ifttt#readme",
+  "dependencies": {
+    "express": "^4.15.2"
+  }
 }
