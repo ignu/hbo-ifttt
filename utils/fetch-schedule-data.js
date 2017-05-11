@@ -10,9 +10,17 @@ function fetchScheduleData(date, zone) {
     method: 'GET'
   }).then(res => res.json());
 
+  console.log('res', res)
   return res;
 }
 
+function upcomingShows(seriesName) {
+  console.log('fetching shows for ', seriesName)
+
+  return fetchScheduleData(new Date(), 'west')
+}
+
 module.exports = {
-  fetchScheduleData
+  fetchScheduleData,
+  upcomingShows
 };

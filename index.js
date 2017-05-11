@@ -1,45 +1,69 @@
-var express = require('express')
-var app = express()
-var config = require('dotenv').config().parsed
+const express = require("express");
+const app = express();
+const config = require("dotenv").config().parsed;
+const { upcomingShows } = require("./utils/fetch-schedule-data");
+const bodyParser = require("body-parser");
+const R = require("ramda");
 
-const API_PREFIX = '/ifttt/v1/'
+app.use(bodyParser.json()); // for parsing application/json
+const API_PREFIX = "/ifttt/v1/";
 
-const isValid = (req) => {
-  const requestKey = req.headers['ifttt-channel-key']
+const validate = (req, res) => {
+  const requestKey = req.headers["ifttt-channel-key"];
 
-  return requestKey == config.IFTTT_API_KEY
-}
+  const valid = requestKey == config.IFTTT_API_KEY;
 
-app.get(`${API_PREFIX}status`, function (req, res) {
-  if(isValid(req)) {
-    res.send({});
-  } else {
-    res.status(401).send({error: 'invalid key'})
+  if (!valid) {
+    res.status(401).send({ error: "invalid key" });
   }
-})
 
-app.post(`${API_PREFIX}test/setup`, function (req, res) {
-  if(isValid(req)) {
-    const scaffold = {
-      "data": {
-        "samples": {
-          "triggers": {
-            "new_show_scheduled": {
-              "episode": {
-                "title": "G'Day Melbourne"
-              }
-            }
+  return valid;
+};
+
+app.get(`${API_PREFIX}status`, function(req, res) {
+  if (!validate(req, res)) {
+    return;
+  }
+
+  res.send({});
+});
+
+app.post(`${API_PREFIX}test/setup`, function(req, res) {
+  if (!validate(req, res)) {
+    return;
+  }
+
+  const scaffold = {
+    data: {
+      samples: {
+        triggers: {
+          new_show_scheduled: {
+            series: "VEEP"
           }
         }
       }
     }
+  };
 
-    res.send(scaffold);
-  } else {
-    res.status(401).send({error: 'invalid key'})
+  res.send(scaffold);
+});
+
+app.post(`${API_PREFIX}triggers/new_show_scheduled`, function(req, res) {
+  if (!validate(req, res)) {
+    return;
   }
-})
 
-app.listen(process.env.PORT || 3000, function () {
-  console.log('Example app listening on port 3000!')
-})
+  const { series } = req.body.triggerFields;
+  const promise = upcomingShows(series);
+
+  const sendAirings = airings => {
+    console.log("airings", airings);
+    res.send(airings);
+  };
+
+  promise.then(sendAirings);
+});
+
+app.listen(process.env.PORT || 3000, function() {
+  console.log("Example app listening on port 3000!");
+});
