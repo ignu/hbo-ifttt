@@ -18,11 +18,28 @@ app.get(`${API_PREFIX}status`, function (req, res) {
   }
 })
 
-app.post('/status', function (req, res) {
-  console.log('reaaaq', req)
-  res.send({});
+app.post(`${API_PREFIX}test/setup`, function (req, res) {
+  if(isValid(req)) {
+    const scaffold = {
+      "data": {
+        "samples": {
+          "triggers": {
+            "new_show_scheduled": {
+              "episode": {
+                "title": "G'Day Melbourne"
+              }
+            }
+          }
+        }
+      }
+    }
+
+    res.send(scaffold);
+  } else {
+    res.status(401).send({error: 'invalid key'})
+  }
 })
 
-app.listen(process.env.PORT || 3000, function () {
+app.listen(3000, function () {
   console.log('Example app listening on port 3000!')
 })
