@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const config = require("dotenv").config().parsed;
-const { upcomingShows } = require("./utils/fetch-schedule-data");
+const { upcomingShows, parseAirings } = require("./utils/fetch-schedule-data");
 const bodyParser = require("body-parser");
 const R = require("ramda");
 
@@ -14,7 +14,7 @@ const validate = (req, res) => {
   const valid = requestKey == config.IFTTT_API_KEY;
 
   if (!valid) {
-    res.status(401).send({ error: "invalid key" });
+    res.status(401).send({ errors: ["invalid key"] });
   }
 
   return valid;
@@ -56,9 +56,9 @@ app.post(`${API_PREFIX}triggers/new_show_scheduled`, function(req, res) {
   const { series } = req.body.triggerFields;
   const promise = upcomingShows(series);
 
-  const sendAirings = airings => {
-    console.log("airings", airings);
-    res.send(airings);
+  //http://www.hbo.com/api/schedule/programs?focusIds=796161,800594
+  const sendAirings = data => {
+    res.send(parseAirings(data, series));
   };
 
   promise.then(sendAirings);

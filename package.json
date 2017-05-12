@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/ignu/hbo-ifttt#readme",
   "dependencies": {
+    "bluebird": "^3.5.0",
     "body-parser": "^1.17.1",
     "chai": "^3.5.0",
     "dotenv": "^4.0.0",
